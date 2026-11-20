@@ -1,0 +1,431 @@
+:root {
+  --bg: #0f1420;
+  --bg2: #1a2233;
+  --panel: #222c40;
+  --accent: #4ecca3;
+  --danger: #e94560;
+  --gold: #f2c94c;
+  --text: #e8edf5;
+  --muted: #8b9bb4;
+  --grid: #2c3a52;
+  --tower-arrow: #4ecca3;
+  --tower-cannon: #e94560;
+  --tower-ice: #56b6ff;
+  --spawn: #b06bff;
+  --base: #f2c94c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--bg2);
+  border-bottom: 2px solid var(--grid);
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 56px;
+}
+
+.stat .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.stat span:last-child {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#stat-gold { color: var(--gold); }
+#stat-lives { color: var(--danger); }
+#stat-wave { color: var(--accent); }
+
+.spacer { flex: 1; }
+
+.icon-btn {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--grid);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  user-select: none;
+}
+
+.icon-btn:hover { background: #2c3a52; }
+.icon-btn:active { transform: scale(0.95); }
+.icon-btn.active { background: var(--accent); color: var(--bg); }
+
+#stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+#game-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  touch-action: none;
+  image-rendering: pixelated;
+  border-radius: 4px;
+  box-shadow: 0 0 40px rgba(78, 204, 163, 0.05);
+}
+
+/* ---------- Bottom bar ---------- */
+#bottombar {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg2);
+  border-top: 2px solid var(--grid);
+  min-height: 84px;
+}
+
+#build-menu {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.build-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 76px;
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 2px solid var(--grid);
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s, background 0.15s;
+  user-select: none;
+}
+
+.build-btn:hover { background: #2c3a52; }
+.build-btn:active { transform: scale(0.95); }
+.build-btn.active {
+  border-color: var(--accent);
+  background: rgba(78, 204, 163, 0.12);
+}
+
+.build-btn .b-name { font-size: 12px; font-weight: 600; }
+.build-btn .b-cost { font-size: 11px; color: var(--gold); font-weight: 700; }
+
+.b-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+  border: 2px solid currentColor;
+}
+.arrow-icon { color: var(--tower-arrow); border-radius: 50%; }
+.cannon-icon { color: var(--tower-cannon); border-radius: 4px; transform: rotate(45deg); }
+.ice-icon { color: var(--tower-ice); transform: rotate(45deg); border-radius: 4px; }
+
+/* ---------- Skill button ---------- */
+.skill-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 80px;
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 2px solid var(--grid);
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.skill-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 3px;
+  width: var(--cd-progress, 100%);
+  background: var(--gold);
+  transition: width 0.2s linear;
+}
+.skill-btn.ready { border-color: var(--gold); }
+.skill-btn.ready:hover { background: rgba(242,201,76,0.1); }
+.skill-btn.active { border-color: var(--gold); background: rgba(242,201,76,0.18); }
+.skill-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.skill-icon { font-size: 18px; color: var(--gold); line-height: 1; }
+.skill-label { font-size: 11px; font-weight: 700; }
+.skill-cd { font-size: 10px; color: var(--muted); font-weight: 700; }
+.skill-btn.ready .skill-cd { color: var(--gold); }
+
+/* ---------- Tower info ---------- */
+#tower-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 1px solid var(--grid);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+#tower-info.hidden { display: none; }
+
+#ti-name { font-weight: 700; font-size: 14px; }
+#ti-level {
+  font-size: 12px;
+  color: var(--accent);
+  background: rgba(78,204,163,0.12);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.ti-actions { display: flex; gap: 6px; }
+
+.mini-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--grid);
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.mini-btn:hover { background: #2c3a52; }
+.mini-btn:active { transform: scale(0.95); }
+.mini-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.mini-btn.danger { border-color: var(--danger); color: var(--danger); }
+.mini-btn.danger:hover { background: rgba(233,69,96,0.15); }
+
+/* ---------- Wave button ---------- */
+.wave-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.wave-btn:hover:not(:disabled) { filter: brightness(1.1); }
+.wave-btn:active:not(:disabled) { transform: scale(0.96); }
+.wave-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- Overlay ---------- */
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 14, 22, 0.82);
+  backdrop-filter: blur(6px);
+  padding: 20px;
+}
+#overlay.hidden { display: none; }
+
+.screen {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg2);
+  border: 2px solid var(--grid);
+  border-radius: 18px;
+  padding: 30px 26px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: pop 0.25s ease;
+}
+.screen.hidden { display: none; }
+
+@keyframes pop {
+  from { transform: scale(0.94); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.game-title {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.game-title span { color: var(--accent); }
+
+h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.win-title { color: var(--accent); }
+.lose-title { color: var(--danger); }
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0 18px;
+}
+
+.big-btn {
+  padding: 13px 18px;
+  border-radius: 12px;
+  border: 2px solid var(--grid);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, border-color 0.15s;
+}
+.big-btn:hover { background: #2c3a52; }
+.big-btn:active { transform: scale(0.97); }
+.big-btn.accent {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+.big-btn.accent:hover { filter: brightness(1.1); }
+
+.highscore-line {
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.howto-list {
+  text-align: left;
+  margin: 0 0 22px;
+  padding-left: 4px;
+  list-style: none;
+}
+.howto-list li {
+  position: relative;
+  padding: 8px 0 8px 24px;
+  font-size: 13.5px;
+  color: var(--text);
+  border-bottom: 1px solid rgba(44,58,82,0.6);
+  line-height: 1.45;
+}
+.howto-list li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 15px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.c-arrow { color: var(--tower-arrow); }
+.c-cannon { color: var(--tower-cannon); }
+.c-ice { color: var(--tower-ice); }
+.c-gold { color: var(--gold); }
+.c-boss { color: #b06bff; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 18px 0 10px;
+}
+.stats-grid > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid var(--grid);
+  border-radius: 10px;
+}
+.stats-grid span { color: var(--muted); font-size: 13px; }
+.stats-grid b { font-size: 18px; color: var(--accent); }
+
+/* ---------- Mobile polish ---------- */
+@media (max-width: 640px) {
+  #topbar { gap: 6px; padding: 6px 8px; }
+  .stat { min-width: 44px; }
+  .stat span:last-child { font-size: 15px; }
+  .stat .label { font-size: 9px; }
+  .spacer { display: none; }
+  .wave-btn { flex: 1; padding: 9px 8px; font-size: 12px; min-height: 40px; }
+  .icon-btn { padding: 9px 10px; min-width: 40px; min-height: 40px; }
+
+  #bottombar { padding: 8px; gap: 8px; min-height: 76px; align-items: center; }
+  #build-menu { gap: 6px; }
+  .build-btn { min-width: 56px; padding: 6px; min-height: 60px; }
+  .b-name { font-size: 10px; }
+  .b-cost { font-size: 10px; }
+  .b-icon { width: 18px; height: 18px; }
+
+  .skill-btn { min-width: 64px; min-height: 60px; padding: 6px; }
+  .skill-label { font-size: 10px; }
+  .skill-icon { font-size: 16px; }
+
+  #tower-info { padding: 6px 8px; gap: 6px; }
+  #ti-name { font-size: 12px; }
+  .mini-btn { padding: 8px 10px; min-height: 38px; }
+
+  .game-title { font-size: 27px; }
+  .screen { padding: 24px 18px; }
+}
+
+/* Transisi halus antar layar overlay */
+.screen {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+/* Tombol yang sedang dinonaktifkan tidak menerima sentuhan */
+button:disabled { pointer-events: none; }

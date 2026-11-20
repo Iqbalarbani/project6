@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tower Defense Mini</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="stat"><span class="label">Wave</span><span id="stat-wave">0/10</span></div>
+      <div class="stat"><span class="label">Nyawa</span><span id="stat-lives">20</span></div>
+      <div class="stat"><span class="label">Uang</span><span id="stat-gold">150</span></div>
+      <div class="spacer"></div>
+      <button id="btn-wave" class="wave-btn">Mulai Wave</button>
+      <button id="btn-pause" class="icon-btn" title="Pause">&#10074;&#10074;</button>
+      <button id="btn-speed" class="icon-btn" title="Kecepatan">1x</button>
+      <button id="btn-mute" class="icon-btn" title="Suara">&#9835;</button>
+    </header>
+
+    <main id="stage">
+      <canvas id="game-canvas"></canvas>
+    </main>
+
+    <footer id="bottombar">
+      <div id="build-menu">
+        <button class="build-btn" data-type="arrow">
+          <span class="b-icon arrow-icon"></span>
+          <span class="b-name">Panah</span>
+          <span class="b-cost">50</span>
+        </button>
+        <button class="build-btn" data-type="cannon">
+          <span class="b-icon cannon-icon"></span>
+          <span class="b-name">Meriam</span>
+          <span class="b-cost">90</span>
+        </button>
+        <button class="build-btn" data-type="ice">
+          <span class="b-icon ice-icon"></span>
+          <span class="b-name">Es</span>
+          <span class="b-cost">70</span>
+        </button>
+      </div>
+
+      <button id="btn-skill" class="skill-btn" title="Serangan Udara">
+        <span class="skill-icon">&#9737;</span>
+        <span class="skill-label">Air Strike</span>
+        <span class="skill-cd" id="skill-cd">Siap</span>
+      </button>
+
+      <div id="tower-info" class="hidden">
+        <span id="ti-name">Menara</span>
+        <span id="ti-level">Lv.1</span>
+        <div class="ti-actions">
+          <button id="btn-upgrade" class="mini-btn">Upgrade</button>
+          <button id="btn-sell" class="mini-btn danger">Jual</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Overlay menu / hasil -->
+  <div id="overlay">
+    <!-- Menu utama -->
+    <section id="screen-menu" class="screen hidden">
+      <h1 class="game-title">Tower Defense <span>Mini</span></h1>
+      <p class="subtitle">Pertahankan base-mu dari 10 gelombang musuh.</p>
+      <div class="menu-actions">
+        <button id="btn-start" class="big-btn accent">Mulai</button>
+        <button id="btn-howto" class="big-btn">Cara Bermain</button>
+      </div>
+      <p class="highscore-line">Skor Tertinggi: <span id="menu-highscore">0</span></p>
+    </section>
+
+    <!-- Cara bermain -->
+    <section id="screen-howto" class="screen hidden">
+      <h2>Cara Bermain</h2>
+      <ul class="howto-list">
+        <li>Pilih menara di bawah, lalu klik tile kosong untuk menempatkannya.</li>
+        <li>Menara <b class="c-arrow">Panah</b> murah & cepat; <b class="c-cannon">Meriam</b> damage area; <b class="c-ice">Es</b> memperlambat musuh.</li>
+        <li>Kamu tidak bisa memblokir total jalur musuh ke base.</li>
+        <li>Klik menara untuk Upgrade (2x) atau Jual.</li>
+        <li>Tekan <b>Mulai Wave</b> untuk mengirim gelombang. Selesaikan 10 wave untuk menang.</li>
+        <li>Gunakan skill <b class="c-gold">Serangan Udara</b> (cooldown 25 detik) dengan mengklik tombol, lalu klik area target.</li>
+        <li>Wave terakhir memunculkan <b class="c-boss">Boss</b> â€” HP tinggi dan aura yang memperlambat menara di dekatnya.</li>
+        <li>Musuh yang lolos mengurangi nyawa. Nyawa habis = kalah.</li>
+      </ul>
+      <button id="btn-howto-back" class="big-btn">Kembali</button>
+    </section>
+
+    <!-- Menang -->
+    <section id="screen-win" class="screen hidden">
+      <h2 class="win-title">Kemenangan!</h2>
+      <p class="subtitle">Kamu bertahan dari semua gelombang.</p>
+      <div class="stats-grid">
+        <div><span>Wave</span><b id="win-stat-waves">0</b></div>
+        <div><span>Musuh dikalahkan</span><b id="win-stat-kills">0</b></div>
+        <div><span>Skor</span><b id="win-stat-score">0</b></div>
+      </div>
+      <p id="win-highscore" class="highscore-line"></p>
+      <div class="menu-actions">
+        <button id="btn-win-again" class="big-btn accent">Main Lagi</button>
+        <button id="btn-win-menu" class="big-btn">Menu</button>
+      </div>
+    </section>
+
+    <!-- Kalah -->
+    <section id="screen-lose" class="screen hidden">
+      <h2 class="lose-title">Game Over</h2>
+      <p class="subtitle">Base-mu jatuh. Coba lagi!</p>
+      <div class="stats-grid">
+        <div><span>Wave</span><b id="lose-stat-waves">0</b></div>
+        <div><span>Musuh dikalahkan</span><b id="lose-stat-kills">0</b></div>
+        <div><span>Skor</span><b id="lose-stat-score">0</b></div>
+      </div>
+      <p id="lose-highscore" class="highscore-line"></p>
+      <div class="menu-actions">
+        <button id="btn-lose-again" class="big-btn accent">Main Lagi</button>
+        <button id="btn-lose-menu" class="big-btn">Menu</button>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

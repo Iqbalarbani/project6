@@ -1,0 +1,21 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Dependensi (tidak dipakai, tapi jaga-jaga)
+node_modules/
+
+# Log & cache
+*.log
+.npm/
+
+# Artefak build (tidak ada build step, tapi aman)
+dist/
+build/
+
+# File pribadi
+.env
+.env.*
